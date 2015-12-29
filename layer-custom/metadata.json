@@ -1,0 +1,32 @@
+{
+  "name": "layer-custom",
+  "description": "ElasticSearch Custom scripts from http://blogs.aws.amazon.com/application-management/post/Tx3MEVKS0A4G7R5/Deploying-Elasticsearch-with-OpsWorks",
+  "long_description": "",
+  "maintainer": "amazonwebservices",
+  "maintainer_email": "YOUR_EMAIL",
+  "license": "Apache 2.0",
+  "platforms": {
+  },
+  "dependencies": {
+    "elasticsearch": ">= 0.0.0"
+  },
+  "recommendations": {
+  },
+  "suggestions": {
+  },
+  "conflicting": {
+  },
+  "providing": {
+  },
+  "replacing": {
+  },
+  "attributes": {
+  },
+  "groupings": {
+  },
+  "recipes": {
+  },
+  "version": "1.0.0",
+  "source_url": "",
+  "issues_url": ""
+}
