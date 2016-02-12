@@ -6,7 +6,7 @@ update:
 	rm -rf *
 	mv /tmp/opsworks-elasticsearch-cookbook/* .
 	git add .
-	git commit -m 'New update'
+	git commit -m 'New update' || true
 	git push
 	git checkout master
 	git reset HEAD --hard

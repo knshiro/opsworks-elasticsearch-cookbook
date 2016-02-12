@@ -14,18 +14,24 @@ elasticsearch_install 'elasticsearch' do
 end
 
 elasticsearch_configure 'elasticsearch' do
-	configuration ({
-		'network.bind_host' => '0.0.0.0',
-		'network.publish_host' => '_non_loopback_',
-	})
+  if node['elasticsearch']['config']
+    configuration(ElasticsearchOpsWorksCookbook::Helpers.flat_hash(node['elasticsearch']['config']))
+    [:path_data, :path_logs].each do |attr|
+      key = attr.to_s.gsub('_','.')
+      self.send(attr, { 
+        tarball: node['elasticsearch']['config'][key],
+        package: node['elasticsearch']['config'][key],
+      }) if node['elasticsearch']['config'][key]
+    end
+  end
 end
 
-node[:elasticsearch][:plugins].each do |plug|
-  elasticsearch_plugin (plug.kind_of?(String) ? plug : plug[:name]) do
-  	url plug[:url] if plug.kind_of?(Hash) && plug[:url]
-  	action :install
-	end
-end if node[:elasticsearch] && node[:elasticsearch][:plugins]
+node['elasticsearch']['plugins'].each do |plug|
+  elasticsearch_plugin (plug.kind_of?(String) ? plug : plug['name']) do
+    url plug['url'] if plug.kind_of?(Hash) && plug['url']
+    action :install
+  end
+end if node['elasticsearch'] && node['elasticsearch']['plugins']
 
 elasticsearch_service 'elasticsearch' do
   service_actions [:enable, :start]
