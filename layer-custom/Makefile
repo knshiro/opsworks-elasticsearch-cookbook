@@ -1,6 +1,7 @@
 update:
 	git checkout master
 	git stash
+	berks update
 	berks vendor /tmp/opsworks-elasticsearch-cookbook
 	git checkout pub
 	rm -rf *

@@ -115,9 +115,17 @@ module ElasticsearchCookbook
       if new_resource.download_checksum
         new_resource.download_checksum
       elsif install_type.to_s == 'tar' || install_type.to_s == 'tarball'
-        node['elasticsearch']['checksums'][version]['tar']
+        node && version &&
+          node['elasticsearch'] &&
+          node['elasticsearch']['checksums'] &&
+          node['elasticsearch']['checksums'][version] &&
+          node['elasticsearch']['checksums'][version]['tar']
       elsif install_type.to_s == 'package' && node['elasticsearch']['checksums'][version] && node['elasticsearch']['checksums'][version][platform_family]
-        node['elasticsearch']['checksums'][version][platform_family]
+        node && version && platform_family &&
+          node['elasticsearch'] &&
+          node['elasticsearch']['checksums'] &&
+          node['elasticsearch']['checksums'][version] &&
+          node['elasticsearch']['checksums'][version][platform_family]
       end
     end
 
@@ -152,6 +160,25 @@ module ElasticsearchCookbook
       else
         value.to_s
       end
+    end
+
+    # proxy helpers for chef
+    def get_configured_proxy
+      if Chef::Config['http_proxy'] && !Chef::Config['http_proxy'].empty?
+        Chef::Config['http_proxy']
+      elsif Chef::Config['https_proxy'] && !Chef::Config['https_proxy'].empty?
+        Chef::Config['https_proxy']
+      end
+    end
+
+    def get_java_proxy_arguments(enabled = true)
+      return '' unless enabled
+
+      require 'uri'
+      parsed_uri = URI(get_configured_proxy)
+      "-DproxyHost=#{parsed_uri.host} -DproxyPort=#{parsed_uri.port}"
+    rescue
+      ''
     end
   end
 end

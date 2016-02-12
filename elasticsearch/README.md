@@ -14,7 +14,7 @@ repository.
 [Java Runtime](https://www.java.com/en/) - This cookbook requires java, but does not provide it. Please install
 Java before using any recipe in this cookbook. Please also note that Elasticsearch itself has specific minimum Java version requirements. We recommend [this cookbook](https://github.com/agileorbit-cookbooks/java) to install Java.
 
-[Elasticsearch](https://www.elastic.co/products/elasticsearch) - This cookbook has been upgraded to support Elasticsearch 2.0 and greater. While this cookbook still works with ES 1.7.x at the time of this writing, we expect to eventually **break compatibility in a minor release bump**. If you must have a cookbook that works with older versions of Elasticsearch, please test and then pin to a specific `major.minor` version and only leave the patch release to float.
+[Elasticsearch](https://www.elastic.co/products/elasticsearch) - This cookbook is being written and tested to support Elasticsearch 2.x and greater. While this cookbook presently, by sheer luck, still works with ES 1.7.x at the time of this writing, we are not testing against versions < 2.0.0. Should Elasticsearch 2.x somehow break 1.7.x compatibility in a minor release of 2.x, this cookbook could potentially stop working with ES 1.7.x. If you must have a cookbook that works with older versions of Elasticsearch, please test and then pin to a specific `major.minor` version and only leave the patch release to float.
 
 ## Attributes
 
@@ -28,7 +28,7 @@ the version parameter as a string into your download_url.
 
 |Name|Default|Other values|
 |----|-------|------------|
-|`default['elasticsearch']['version']`|`'2.1.0'`|[See list](attributes/default.rb).|
+|`default['elasticsearch']['version']`|`'2.2.0'`|[See list](attributes/default.rb).|
 |`default['elasticsearch']['install_type']`|`:package`|`:tarball`|
 |`default['elasticsearch']['download_urls']['debian']`|[See values](attributes/default.rb).|`%s` will be replaced with the version attribute above|
 |`default['elasticsearch']['download_urls']['rhel']`|[See values](attributes/default.rb).|`%s` will be replaced with the version attribute above|
@@ -224,13 +224,13 @@ Very complicated -
 ```ruby
 elasticsearch_configure 'my_elasticsearch' do
   # if you override one of these, you probably want to override all
-  dir '/usr/local/awesome'
-  path_conf     tarball: "/usr/local/awesome/etc/elasticsearch"
-  path_data     tarball: "/usr/local/awesome/var/data/elasticsearch"
-  path_logs     tarball: "/usr/local/awesome/var/log/elasticsearch"
-  path_pid      tarball: "/usr/local/awesome/var/run/elasticsearch"
-  path_plugins  tarball: "/usr/local/elasticsearch/plugins"
-  path_bin      tarball: "/usr/local/bin"
+  path_home     tarball: "/opt/elasticsearch"
+  path_conf     tarball: "/etc/opt/elasticsearch"
+  path_data     tarball: "/var/opt/elasticsearch"
+  path_logs     tarball: "/var/log/elasticsearch"
+  path_pid      tarball: "/var/run/elasticsearch"
+  path_plugins  tarball: "/opt/elasticsearch/plugins"
+  path_bin      tarball: "/opt/elasticsearch/bin"
 
   logging({:"action" => 'INFO'})
 
@@ -322,6 +322,17 @@ end
 
 elasticsearch_plugin 'mapper-attachments' do
   url 'file:/path/to/my-plugin-1.0.0.zip'
+  action :install
+end
+```
+
+The plugin resource respects the `https_proxy` or `http_proxy` (non-SSL)
+[Chef settings](https://docs.chef.io/config_rb_client.html) unless explicitly
+disabled using `chef_proxy false`:
+```
+elasticsearch_plugin 'kopf' do
+  url 'lmenezes/elasticsearch-kopf'
+  chef_proxy false
   action :install
 end
 ```
